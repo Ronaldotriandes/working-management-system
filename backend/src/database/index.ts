@@ -1,8 +1,8 @@
-import sequelize from './db';
 import Role from '../collections/role/model';
 import User from '../collections/user/model';
-import WorkOrder from '../collections/workOrder/model';
 import WorkOrderTracking from '../collections/workOderTracking/model';
+import WorkOrder from '../collections/workOrder/model';
+import sequelize from './db';
 
 User.belongsTo(Role, { foreignKey: 'roleId', as: 'userRole' });
 Role.hasMany(User, { foreignKey: 'roleId' });
@@ -41,4 +41,4 @@ const initializeDatabase = async () => {
   }
 };
 
-export { sequelize, Role, User, WorkOrder, WorkOrderTracking, initializeDatabase };
+export { Role, User, WorkOrder, WorkOrderTracking, initializeDatabase, sequelize };

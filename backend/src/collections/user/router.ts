@@ -1,22 +1,22 @@
-import express, { NextFunction, RequestHandler, Router } from 'express';
+import express, { RequestHandler, Router } from 'express';
 import Joi from 'joi';
+import { authMiddleware } from '../../middleware/auth.middleware';
 import controller from './controller';
 import { IUserReqBody } from './dto';
-import User from './model';
 const router: Router = express.Router();
+router.use(authMiddleware);
+
 
 // Define validation schema
 const bookVAlidate = Joi.object<IUserReqBody>({
-  username: Joi.string().required(),
   password: Joi.string().required(),
-  fullName: Joi.string().required(),
+  fullname: Joi.string().required(),
   email: Joi.string().email().required(),
   roleId: Joi.string().required(),
 });
 const bookVAlidateUpdate = Joi.object<IUserReqBody>({
-  username: Joi.string(),
   password: Joi.string(),
-  fullName: Joi.string(),
+  fullname: Joi.string(),
   email: Joi.string().email(),
   roleId: Joi.string(),
 });

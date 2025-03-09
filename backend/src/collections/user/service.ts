@@ -1,19 +1,18 @@
-import User from './model';
-import { NotFoundError } from '../../lib/error';
-import bcrypt from 'bcrypt';
 import { Op } from 'sequelize';
+import { NotFoundError } from '../../lib/error';
+import User from './model';
 
 // Define interfaces for the service
 export interface IUserBody {
-  username: string;
   password: string;
-  fullName: string;
+  fullname: string;
   email: string;
   roleId: number;
   [key: string]: any;
 }
 
 export interface IQuery {
+  roleId?: string;
   search?: string;
   page?: string;
   limit?: string;
@@ -26,27 +25,25 @@ export class UserService {
    */
   public async getAllUsers(query: IQuery) {
     const searchQuery = query.search || '';
+    const searchByRole = query.roleId || '';
+
     const page: number = parseInt(query.page as string) || 1;
     const limit: number = parseInt(query.limit as string) || 10;
     const offset = (page - 1) * limit;
 
-    // Build where clause for search
-    const whereClause = searchQuery
+    const whereClause = searchByRole
       ? {
           [Op.or]: [
-            { username: { [Op.like]: `%${searchQuery}%` } },
-            { fullName: { [Op.like]: `%${searchQuery}%` } },
+            { fullname: { [Op.like]: `%${searchQuery}%` } },
             { email: { [Op.like]: `%${searchQuery}%` } },
           ],
         }
       : {};
-
-    // Get users with count for pagination
+        console.log(searchByRole)
     const { count, rows } = await User.findAndCountAll({
-      where: whereClause,
       limit,
       offset,
-      attributes: ['id', 'username', 'fullName', 'email', 'roleId'],
+      attributes: ['id', 'fullname', 'email', 'roleId'],
       include: [{ model: require('../role/model').default, as: 'userRole' }],
     });
 
@@ -70,8 +67,7 @@ export class UserService {
     // Return user without sensitive data
     return {
       id: user.id,
-      username: user.username,
-      fullName: user.fullName,
+      fullname: user.fullname,
       email: user.email,
       roleId: user.roleId,
     };
@@ -82,7 +78,7 @@ export class UserService {
    */
   public async findById(id: string) {
     const user = await User.findByPk(id, {
-      attributes: ['id', 'username', 'fullName', 'email', 'roleId'],
+      attributes: ['id', 'fullname', 'email', 'roleId'],
       include: [{ model: require('../role/model').default, as: 'userRole' }],
     });
 
@@ -109,8 +105,7 @@ export class UserService {
     // Return updated user without password
     return {
       id: user.id,
-      username: user.username,
-      fullName: user.fullName,
+      fullname: user.fullname,
       email: user.email,
       roleId: user.roleId,
     };

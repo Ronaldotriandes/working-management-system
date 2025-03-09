@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
-import moment from 'moment';
-import service from './service';
 import { SuccessCreated, SuccessOK, SuccessOKMeta } from '../../lib/response';
+import service from './service';
 
 export class PaymentController {
   public async getAllData(req: Request, res: Response): Promise<any> {

@@ -1,16 +1,14 @@
 import Role from '../role/model';
 
 export interface IUserBody {
-  username: string;
   password: string;
-  fullName: string;
+  fullname: string;
   role: Role;
 }
 
 export interface IUserResponse {
   id: string;
-  username: string;
-  fullName: string;
+  fullname: string;
   role: Role;
 }
 
@@ -21,9 +19,8 @@ export interface IQuery {
 }
 
 export interface IUserReqBody {
-  username: string;
   password: string;
-  fullName: string;
+  fullname: string;
   email: string;
   roleId: string;
   role?: Role;

@@ -1,10 +1,10 @@
-import { WorkOrderStatus } from '../../entities/WorkOrder';
+import { WorkOrderStatus } from './model';
 
 export interface IWorkOrderBody {
   productName: string;
   quantity: number;
   deadline: Date;
-  assignedOperatorId: string;
+  operatorId: number;
 }
 
 export interface IUpdateWorkOrderBody {
@@ -12,7 +12,7 @@ export interface IUpdateWorkOrderBody {
   quantity?: number;
   deadline?: Date;
   status?: WorkOrderStatus;
-  assignedOperatorId?: string;
+  operatorId?: string;
 }
 
 export interface IStatusChangeBody {

@@ -1,4 +1,4 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, Op } from 'sequelize';
 import sequelize from '../../database/db';
 import User from '../user/model';
 
@@ -9,7 +9,7 @@ export enum WorkOrderStatus {
   CANCELED = 'Canceled',
 }
 
-interface WorkOrderAttributes {
+export interface WorkOrderAttributes {
   id?: number;
   orderNumber: string;
   productName: string;
@@ -19,6 +19,7 @@ interface WorkOrderAttributes {
   operatorId: number;
   createdById: number;
   completedQuantity?: number;
+  description?: string;
 }
 
 class WorkOrder extends Model<WorkOrderAttributes> implements WorkOrderAttributes {
@@ -31,6 +32,7 @@ class WorkOrder extends Model<WorkOrderAttributes> implements WorkOrderAttribute
   public operatorId!: number;
   public createdById!: number;
   public completedQuantity!: number;
+  public description!: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -86,11 +88,40 @@ WorkOrder.init(
       allowNull: true,
       defaultValue: 0,
     },
+    description: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
   },
   {
     sequelize,
     tableName: 'work_orders',
     timestamps: true,
+    hooks: {
+      beforeCreate: async (workOrder: WorkOrder) => {
+        const today = new Date();
+        const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+        
+        // Get the latest work order for today
+        const latestWorkOrder = await WorkOrder.findOne({
+          where: {
+            orderNumber: {
+              [Op.like]: `WO-${dateStr}-%`
+            }
+          },
+          order: [['orderNumber', 'DESC']],
+        });
+
+        let sequence = 1;
+        if (latestWorkOrder) {
+          const lastSequence = parseInt(latestWorkOrder.orderNumber.split('-')[2]);
+          sequence = lastSequence + 1;
+        }
+
+        // Generate the new order number
+        workOrder.orderNumber = `WO-${dateStr}-${String(sequence).padStart(3, '0')}`;
+      }
+    }
   }
 );
 

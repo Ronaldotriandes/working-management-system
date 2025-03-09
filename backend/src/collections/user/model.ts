@@ -1,21 +1,19 @@
-import { Model, DataTypes, Optional } from 'sequelize';
-import sequelize from '../../database/db'; // You'll need to create this
 import bcrypt from 'bcrypt';
+import { DataTypes, Model } from 'sequelize';
+import sequelize from '../../database/db'; // You'll need to create this
 import Role from '../role/model';
 interface UserAttributes {
   id?: number;
-  username: string;
   password: string;
-  fullName: string;
+  fullname: string;
   email: string;
   roleId: number;
 }
 
 class User extends Model<UserAttributes> implements UserAttributes {
   public id!: number;
-  public username!: string;
   public password!: string;
-  public fullName!: string;
+  public fullname!: string;
   public email!: string;
   public roleId!: number;
 
@@ -35,16 +33,11 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    username: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-      unique: true,
-    },
     password: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    fullName: {
+    fullname: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },

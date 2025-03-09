@@ -1,18 +1,29 @@
+import dotenv from 'dotenv';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import 'express-async-errors';
-import dotenv from 'dotenv';
 // import BookRouter from '../src/collections/book/router';
-import { errorHandler } from './middleware/errorHadler';
+import cors from 'cors';
 import helmet from 'helmet';
-import { limiter, paramProtection } from './middleware/security';
+import AuthRouter from '../src/collections/auth/router';
+import UserRouter from '../src/collections/user/router';
+import WorkRouter from '../src/collections/workOrder/router';
 import config from './config/config';
 import { initializeDatabase } from './database';
-import UserRouter from '../src/collections/user/router';
+import { errorHandler } from './middleware/errorHadler';
+import { limiter, paramProtection } from './middleware/security';
 // @ts-ignore
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
+
+app.use(cors({
+  origin: '*', // For development. In production, specify allowed origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  // allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+
 app.use(helmet()); // Security headers
 
 // Middleware
@@ -24,8 +35,9 @@ app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to Express TypeScript API' });
 });
 app.use('/api', limiter);
+app.use('/api/auth', AuthRouter);
 app.use('/api/users', UserRouter);
-
+app.use('/api/work-orders', WorkRouter);
 app.use(paramProtection); // Parameter pollution protection
 
 app.all('*', (req: Request, res: Response) => {
@@ -34,6 +46,7 @@ app.all('*', (req: Request, res: Response) => {
     message: `Can't find ${req.originalUrl} on this server`,
   });
 });
+
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   errorHandler(err, req, res, next);
 });
